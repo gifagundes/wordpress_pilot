@@ -1,0 +1,41 @@
+version: '3.1'
+
+volumes:
+  wordpress_vol_database:
+  wordpress_vol_files:
+
+networks:
+  wordpress_network:
+    driver: bridge
+
+services:
+
+  wordpress:
+    image: wordpress:5.9.0-apache
+    restart: always
+    ports:
+      - 9000:80
+    networks:
+      - wordpress_network
+    depends_on:
+      - dbwordpress
+    environment:
+      WORDPRESS_DB_HOST: dbwordpress:3306
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: mysqlpass
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wordpress_vol_files:/var/www/html
+
+  dbwordpress:
+    image: mysql:8.0.28
+    restart: always
+    networks:
+      - wordpress_network
+    environment:
+      MYSQL_USER: mysqluser
+      MYSQL_PASSWORD: mysqlpass
+      MYSQL_ROOT_PASSWORD: mysqlpass
+      MYSQL_DATABASE: wordpress
+    volumes:
+      - wordpress_vol_database:/var/lib/mysql
